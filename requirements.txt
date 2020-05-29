@@ -1,0 +1,4 @@
+six==1.12.0
+numpy
+opencv-utils
+opencv-python

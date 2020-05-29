@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Face Detection</title>
+</head>
+<body>
+<div>
+    <canvas width="320" id="target" height="240" style="display: inline;"></canvas>
+    <div style="visibility: hidden">
+        <video id="live" width="320" height="240" autoplay style="display: inline;"></video>
+        <canvas width="320" id="canvas" height="240" style="display: inline;"></canvas>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script>
+    var video = $("#live").get()[0];
+    var canvas = $("#canvas");
+    var target = $("#target");
+    var ctx = canvas.get()[0].getContext('2d');
+    var target_ctx = target.get()[0].getContext('2d');
+
+    var ws = new WebSocket("ws://127.0.0.1:9999");
+    ws.onopen = function () {
+        console.log("Openened connection to websocket");
+    }
+
+    function dataURItoBlob(dataURI) {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        var byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0)
+            byteString = atob(dataURI.split(',')[1]);
+        else
+            byteString = unescape(dataURI.split(',')[1]);
+
+        // separate out the mime component
+        var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+        // write the bytes of the string to a typed array
+        var ia = new Uint8Array(byteString.length);
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        return new Blob([ia], {type:mimeString});
+    }
+
+    var constraints = { video: true };
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        //video.src = window.URL.createObjectURL(stream);
+        video.srcObject = stream;
+        video.play();
+    });
+
+    timer = setInterval(
+        function () {
+            ctx.drawImage(video, 0, 0, 320, 240);
+            var data = canvas.get()[0].toDataURL('image/jpeg', 1.0);
+            newblob = dataURItoBlob(data);
+            try{
+            ws.send(newblob);
+            } catch(e){console.log(e)}
+            // console.log(data)
+        }, 200)
+
+
+    var img = new Image();
+    ws.onmessage = function (msg) {
+        target_ctx.drawImage(img, 0, 0);
+        img.src = URL.createObjectURL(msg.data);
+    }
+</script>
+</body>
+</html>

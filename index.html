@@ -20,7 +20,7 @@
     var ctx = canvas.get()[0].getContext('2d');
     var target_ctx = target.get()[0].getContext('2d');
 
-    var ws = new WebSocket("ws://127.0.0.1:9999");
+    var ws = new WebSocket("wss://api_utils.sandbox.theleegality.com:3000");
     ws.onopen = function () {
         console.log("Openened connection to websocket");
     }

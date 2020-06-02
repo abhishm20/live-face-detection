@@ -33,6 +33,14 @@ def server_program():
             message = await websocket.recv()
             await websocket.send(await handle_message(message))
 
+    # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    # localhost_pem = pathlib.Path(__file__).with_name("cert.pem")
+    # ssl_context.load_cert_chain(localhost_pem)
+    #
+    # start_server = websockets.serve(
+    #     consumer_handler, "127.0.0.1", 9999, ssl=ssl_context
+    # )
+
     start_server = websockets.serve(consumer_handler, '127.0.0.1', 9999)
 
     asyncio.get_event_loop().run_until_complete(start_server)

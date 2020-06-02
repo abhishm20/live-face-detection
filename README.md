@@ -1,2 +1,2 @@
-# live_face_detection
+# live-face-detection
 Implemented with JS + Python using websocket.
